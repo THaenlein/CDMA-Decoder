@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.19.2)
+project("CDMA_Decoder_Cpp")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set_property(DIRECTORY ${CMAKE_CURRENT_LIST_DIR} PROPERTY VS_STARTUP_PROJECT "${PROJECT_NAME}")
+
+INCLUDE("${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt")
+include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
