@@ -7,3 +7,17 @@ set_property(DIRECTORY ${CMAKE_CURRENT_LIST_DIR} PROPERTY VS_STARTUP_PROJECT "${
 
 INCLUDE("${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt")
 include_directories(${CMAKE_CURRENT_LIST_DIR}/src)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	message(STATUS "Clang detected, no additional compile flags.")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	message(STATUS "GCC detected, adding compile flags.")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -O0 -pedantic -DDEBUG -Wextra")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 -DNDEBUG -Wall -Wpessimizing-move")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+	message(STATUS "Intel detected, no additional compile flags.")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	message(STATUS "Visual Studio detected, adding compile flags.")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} /Zi /Ob0 /Od /RTC1 /DDEBUG /W4")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} /O2 /Ob2 /Ot /DNDEBUG /Wall")
+endif()

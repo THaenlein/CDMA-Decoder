@@ -8,12 +8,10 @@
 #include <chrono>
 
 #include "SequenceGenerator.hpp"
-#include "cdma.hpp"
+#include "Decoder.hpp"
 
-using namespace std;
-using TimeStamp = chrono::time_point<chrono::system_clock>;
-using Duration = chrono::duration<double>;
-
+using TimeStamp = std::chrono::time_point<std::chrono::system_clock>;
+using Duration = std::chrono::duration<double>;
 
 // Buch Seite 580+
 
@@ -30,22 +28,15 @@ int main(int argc, char* argv[])
 #ifndef NDEBUG
     argv[1] = "gps_sequence.txt";
 #endif
-    const string filePath(argv[1]);
 
-    ifstream is(filePath);
-    istream_iterator<int16_t> start(is), end;
-    vector<int16_t> numbers(start, end);
+    std::ifstream is(argv[1]);
+    std::istream_iterator<int16_t> start(is), end;
+    std::vector<int16_t> numbers(start, end);
     const uint32_t sequenceLenth = static_cast<uint32_t>(numbers.size());
-    cout << "Read " << numbers.size() << " numbers" << endl;
-    int16_t NumberOfSatellites = *max_element(numbers.begin(), numbers.end(),
-        [](int16_t a, int16_t b) { return abs(a) < abs(b); });
 
-    // TODO: Start timer
-    TimeStamp timeStart = chrono::system_clock::now();
+    TimeStamp timeStart = std::chrono::system_clock::now();
 
-    // Maybe add last shift register element to each vector?
-    
-    vector<cdma::IndexPair> shiftRegisterSumIndices {
+    std::vector<cdma::IndexPair> shiftRegisterSumIndices {
         { 1, 5 },
         { 2, 6 },
         { 3, 7 },
@@ -72,25 +63,25 @@ int main(int argc, char* argv[])
         { 3, 5 }
     };
 
-    vector<cdma::SequenceGenerator> generators;
+    std::vector<cdma::SequenceGenerator> generators;
+    generators.reserve(shiftRegisterSumIndices.size());
     for (const cdma::IndexPair& indices : shiftRegisterSumIndices)
     {
         generators.push_back(cdma::SequenceGenerator(indices, sequenceLenth));
     }
 
-    // TODO: Create chip sequence decoder
+    cdma::Decoder chipDecoder(numbers);
+    std::vector<cdma::Correlation> decodeResult = chipDecoder.decode(generators);
 
-    // TODO: Create decoded signal 
-
-    // TODO: Stop timer
-    TimeStamp timeEnd = chrono::system_clock::now();
+    TimeStamp timeEnd = std::chrono::system_clock::now();
     Duration timeSpan = timeEnd - timeStart;
     double runTime = timeSpan.count();
 
-    // TODO: Print results
-    cout << "Time spent decoding signal: " << setprecision(6) << runTime << " seconds." << endl;
-    cout << "Number of satellites: " << NumberOfSatellites << endl;
-    //cout << "numbers read in:\n";
-    //copy(numbers.begin(), numbers.end(), ostream_iterator<int16_t>(cout, " "));
-    //cout << endl;
+    for (cdma::Correlation& correlation : decodeResult)
+    {
+        std::cout << "Satellite " << std::setw(2) << correlation.satelliteId
+                  << " has sent bit " << correlation.message
+                  << " (delta = " << std::setw(3) << correlation.offset << ")" << std::endl;
+    }
+    std::cout << "Time spent decoding signal: " << std::setprecision(6) << runTime << " seconds." << std::endl;
 }

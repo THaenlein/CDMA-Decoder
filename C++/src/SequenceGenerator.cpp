@@ -1,23 +1,23 @@
-#include<deque>
-
 #include "SequenceGenerator.hpp"
 
-using namespace std;
 using namespace cdma;
 
 /*static*/ const size_t SequenceGenerator::REGISTER_LENGTH = 10;
 
 /*static*/ MotherSequenceIndices SequenceGenerator::SHIFT_INDICES({ 2 }, { 1, 2, 5, 7, 8 });
 
-vector<bool> SequenceGenerator::generate()
+std::vector<bool> SequenceGenerator::generate() const
 {
-    vector<bool> sequence(this->sequenceLength);
-    MotherSequences motherSequences(deque<bool>(REGISTER_LENGTH, true), deque<bool>(REGISTER_LENGTH, true));
+    std::vector<bool> sequence;
+    sequence.reserve(this->sequenceLength);
+    MotherSequences motherSequences(std::deque<bool>( REGISTER_LENGTH, true ), std::deque<bool>(REGISTER_LENGTH, true));
 
     for (size_t i = 0; i < this->sequenceLength; i++)
     {
         bool motherFirst = motherSequences.first.back();
-        bool motherSecond = motherSequences.second[registerSumIndices.first] ^ motherSequences.second[registerSumIndices.second];
+        bool motherSecond = 
+            motherSequences.second[this->registerSumIndices.first] ^
+            motherSequences.second[this->registerSumIndices.second];
 
         // Is this the right insertion order? Push front or push back? 
         sequence.push_back(motherFirst ^ motherSecond);
@@ -28,7 +28,8 @@ vector<bool> SequenceGenerator::generate()
     
     return move(sequence);
 }
-void SequenceGenerator::shiftMotherSequence(deque<bool>& motherSequence, vector<uint8_t>& xorIndices)
+
+void SequenceGenerator::shiftMotherSequence(std::deque<bool>& motherSequence, std::vector<uint8_t>& xorIndices) const
 {
     bool newElement = motherSequence.back();
     for (uint8_t index : xorIndices)
