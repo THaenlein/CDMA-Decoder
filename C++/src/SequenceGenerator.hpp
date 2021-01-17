@@ -22,7 +22,7 @@ namespace cdma
 
 	protected:
 
-		void shiftMotherSequence(std::vector<bool>& motherSequence, vector<uint8_t>& xorIndices);
+		void shiftMotherSequence(deque<bool>& motherSequence, vector<uint8_t>& xorIndices);
 
 	private:
 
