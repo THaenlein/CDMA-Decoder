@@ -1,41 +1,81 @@
-#include "SequenceGenerator.hpp"
+#include <stdio.h>
+#include <string.h> 
 
-using namespace cdma;
+#include "SequenceGenerator.h"
 
-/*static*/ const size_t SequenceGenerator::REGISTER_LENGTH = 10;
 
-/*static*/ MotherSequenceIndices SequenceGenerator::SHIFT_INDICES({ 2 }, { 1, 2, 5, 7, 8 });
+static uint8_t shiftRegisterSumIndices[NUM_SATELLITES][2] = {
+    { 1, 5 },
+    { 2, 6 },
+    { 3, 7 },
+    { 4, 8 },
+    { 0, 8 },
+    { 1, 9 },
+    { 0, 7 },
+    { 1, 8 },
+    { 2, 9 },
+    { 1, 2 },
+    { 2, 3 },
+    { 4, 5 },
+    { 5, 6 },
+    { 6, 7 },
+    { 7, 8 },
+    { 8, 9 },
+    { 0, 3 },
+    { 1, 4 },
+    { 2, 5 },
+    { 3, 6 },
+    { 4, 7 },
+    { 5, 8 },
+    { 0, 2 },
+    { 3, 5 }
+};
 
-std::vector<bool> SequenceGenerator::generate() const
+static uint8_t SHIFT_INDICES_TOP[] = { 2 };
+static uint8_t SHIFT_INDICES_BOTTOM[] = { 1, 2, 5, 7, 8 };
+
+
+void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices)
 {
-    std::vector<bool> sequence;
-    sequence.reserve(this->sequenceLength);
-    MotherSequences motherSequences(std::deque<bool>( REGISTER_LENGTH, true ), std::deque<bool>(REGISTER_LENGTH, true));
+    bool motherSequenceTop    [REGISTER_LENGTH];
+    bool motherSequenceBottom [REGISTER_LENGTH];
+    memset(motherSequenceTop,    true, REGISTER_LENGTH * sizeof(bool));
+    memset(motherSequenceBottom, true, REGISTER_LENGTH * sizeof(bool));
+    printf("Sequence %d: ", indexOfIndices);
 
-    for (size_t i = 0; i < this->sequenceLength; i++)
+    int i;
+    for (i = 0; i < size; i++)
     {
-        bool motherFirst = motherSequences.first.back();
-        bool motherSecond = 
-            motherSequences.second[this->registerSumIndices.first] ^
-            motherSequences.second[this->registerSumIndices.second];
+        bool motherFirst = motherSequenceTop[REGISTER_LENGTH - 1];
+        bool motherSecond = motherSequenceBottom[shiftRegisterSumIndices[indexOfIndices][0]] ^
+                            motherSequenceBottom[shiftRegisterSumIndices[indexOfIndices][1]];
 
-        // Is this the right insertion order? Push front or push back? 
-        sequence.push_back(motherFirst ^ motherSecond);
+        sequence[i] = motherFirst ^ motherSecond;
+        printf("%d ", sequence[i]);
 
-        shiftMotherSequence(motherSequences.first, SHIFT_INDICES.first);
-        shiftMotherSequence(motherSequences.second, SHIFT_INDICES.second);
+        _shiftMotherSequence(motherSequenceTop, REGISTER_LENGTH, SHIFT_INDICES_TOP, sizeof(SHIFT_INDICES_TOP));
+        _shiftMotherSequence(motherSequenceBottom, REGISTER_LENGTH, SHIFT_INDICES_BOTTOM, sizeof(SHIFT_INDICES_BOTTOM));
     }
-    
-    return move(sequence);
+
+    printf("\n");
+    return;
 }
 
-void SequenceGenerator::shiftMotherSequence(std::deque<bool>& motherSequence, std::vector<uint8_t>& xorIndices) const
+void _shiftMotherSequence(bool* sequence, int size, uint8_t* xorIndices, int indiceSize)
 {
-    bool newElement = motherSequence.back();
-    for (uint8_t index : xorIndices)
+    bool newElement = sequence[size - 1];
+    int i;
+    for (i = 0; i < indiceSize; i++)
     {
-        newElement ^= motherSequence[index];
+        uint8_t index = xorIndices[i];
+        newElement ^= sequence[index];
     }
-    motherSequence.pop_back();
-    motherSequence.push_front(newElement);
+
+    // Shift mother sequence
+    for (i = size - 1; i > 0; i--)
+    {
+        sequence[i] = sequence[i - 1];
+    }
+
+    sequence[0] = newElement;
 }

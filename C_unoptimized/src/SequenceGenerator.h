@@ -1,39 +1,14 @@
 #pragma once
 
-#include<vector>
-#include<deque>
+#include <stdbool.h>
+#include <stdint.h>
 
-namespace cdma
-{
+#include "stdafx.h"
 
-	using MotherSequenceIndices = std::pair<std::vector<uint8_t>, std::vector<uint8_t>>;
-	using MotherSequences = std::pair<std::deque<bool>, std::deque<bool>>;
-	using IndexPair = std::pair<uint8_t, uint8_t>;
 
-	class SequenceGenerator
-	{
-	public:
-		
-		SequenceGenerator(IndexPair indices, uint32_t length) :
-			registerSumIndices(indices),
-			sequenceLength(static_cast<size_t>(length))
-		{}
+#define REGISTER_LENGTH 10
 
-		std::vector<bool> generate() const;
 
-	protected:
+void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices);
 
-		void shiftMotherSequence(std::deque<bool>& motherSequence, std::vector<uint8_t>& xorIndices) const;
-
-	private:
-
-		const IndexPair registerSumIndices;
-
-		const size_t sequenceLength;
-
-		static const size_t REGISTER_LENGTH;
-
-		static MotherSequenceIndices SHIFT_INDICES;
-	};
-
-}
+static void _shiftMotherSequence(bool* sequence, int size, uint8_t* xorIndices, int indiceSize);

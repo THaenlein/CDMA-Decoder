@@ -1,0 +1,4 @@
+#pragma once
+
+#define CHIP_SEQUENCE_LENGTH 1023
+#define NUM_SATELLITES 24
