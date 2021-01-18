@@ -41,7 +41,6 @@ void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices)
     bool motherSequenceBottom [REGISTER_LENGTH];
     memset(motherSequenceTop,    true, REGISTER_LENGTH * sizeof(bool));
     memset(motherSequenceBottom, true, REGISTER_LENGTH * sizeof(bool));
-    printf("Sequence %d: ", indexOfIndices);
 
     int i;
     for (i = 0; i < size; i++)
@@ -51,13 +50,11 @@ void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices)
                             motherSequenceBottom[shiftRegisterSumIndices[indexOfIndices][1]];
 
         sequence[i] = motherFirst ^ motherSecond;
-        printf("%d ", sequence[i]);
 
         _shiftMotherSequence(motherSequenceTop, REGISTER_LENGTH, SHIFT_INDICES_TOP, sizeof(SHIFT_INDICES_TOP));
         _shiftMotherSequence(motherSequenceBottom, REGISTER_LENGTH, SHIFT_INDICES_BOTTOM, sizeof(SHIFT_INDICES_BOTTOM));
     }
 
-    printf("\n");
     return;
 }
 

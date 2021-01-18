@@ -1,44 +1,19 @@
 #pragma once
 
-#include<cstdint>
-#include<vector>
+#include <stdint.h>
+#include <stdbool.h>
 
-#include"SequenceGenerator.hpp"
+#include "SequenceGenerator.h"
 
-namespace cdma
+
+typedef struct
 {
+    uint16_t satelliteId;
+    uint16_t offset;
+    bool message;
+}Correlation;
 
-	struct Correlation
-	{
-		uint16_t satelliteId;
-		uint16_t offset;
-		bool message;
-	};
 
-	class Decoder
-	{
-	public:
+void CDMA_decode(bool** sequences, int32_t* chipSequence, int numSendingSatellites, Correlation* outCorrelations);
 
-		Decoder(std::vector<int16_t>& sequence);
-
-		std::vector<Correlation> decode(const std::vector<SequenceGenerator>& generators) const;
-
-	protected:
-
-	private:
-
-		void correlate(
-			std::vector<bool>& sequence,
-			const uint16_t peak,
-			size_t satelliteId,
-			std::vector<Correlation>* outResult) const;
-
-	private:
-		
-		std::vector<int16_t> chipSequence;
-
-		const uint16_t satelliteCount;
-
-		static const uint16_t MAX_DEVIATION;
-	};
-}
+static bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int satelliteId, int foundCorrelations, Correlation* outCorrelations);

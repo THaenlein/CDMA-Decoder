@@ -1,59 +1,46 @@
-#include<vector>
-#include<algorithm>
-#include<numeric>
+#include <stdlib.h>
 
-#include "Decoder.hpp"
+#include "Decoder.h"
+#include "stdafx.h"
 
-using namespace cdma;
 
-/*static*/ const uint16_t Decoder::MAX_DEVIATION = 65;
+#define MAX_DEVIATION 65
 
-Decoder::Decoder(std::vector<int16_t>& sequence) :
-    chipSequence(std::move(sequence)),
-    satelliteCount(
-        std::abs(*std::max_element(chipSequence.begin(), chipSequence.end(),
-        [](int16_t a, int16_t b) { return abs(a) < abs(b); })))
+
+void CDMA_decode(bool** sequences, int32_t* chipSequence, int numSendingSatellites, Correlation* outCorrelations)
 {
+	int i;
+	int numCorrelationsFound = 0;
+	int peak = CHIP_SEQUENCE_LENGTH - MAX_DEVIATION * (numSendingSatellites - 1);
+	for (i = 0; i < NUM_SATELLITES; i++)
+	{
+		bool correlationFound = _correlate(sequences[i], chipSequence, peak, i, numCorrelationsFound, outCorrelations);
+		numCorrelationsFound += (int)correlationFound;
+	}
 
+	return;
 }
 
-std::vector<Correlation> Decoder::decode(const std::vector<SequenceGenerator>& generators) const
+bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int satelliteId, int foundCorrelations, Correlation* outCorrelations)
 {
-    std::vector<Correlation> result;
+	int offset;
+	for (offset = 0; offset < CHIP_SEQUENCE_LENGTH; offset++)
+	{
+		int16_t accumulatedSum = 0;
+		int i;
+		for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
+		{
+			size_t index = (i + offset) % CHIP_SEQUENCE_LENGTH;
+			accumulatedSum += (sequence[index] ? chipSequence[i] : -chipSequence[i]);
+		}
 
-    for (size_t currentSatellite = 0; currentSatellite < generators.size(); currentSatellite++)
-    {
-        std::vector<bool> sequence = generators[currentSatellite].generate();
-        const uint16_t peak = static_cast<uint16_t>(sequence.size()) - MAX_DEVIATION * (this->satelliteCount - 1);
-        correlate(sequence, peak, currentSatellite, &result);
-    }
-
-    return std::move(result);
-}
-
-void Decoder::correlate(
-    std::vector<bool>&sequence,
-    const uint16_t peak,
-    size_t satelliteId,
-    std::vector<Correlation>* outResult) const
-{
-    size_t sequenceSize = sequence.size();
-    for (size_t offset = 0; offset < sequenceSize; offset++)
-    {
-        int16_t accumulatedSum = 0;
-        for (size_t i = 0; i < sequenceSize; i++)
-        {
-            size_t index = (i + offset) % sequenceSize;
-            accumulatedSum += (sequence[index] ? this->chipSequence[i] : -this->chipSequence[i]);
-        }
-
-        if (static_cast<uint16_t>(abs(accumulatedSum)) > peak)
-        {
-            outResult->push_back({
-                static_cast<uint16_t>(satelliteId + 1),
-                static_cast<uint16_t>(offset),
-                accumulatedSum > 0 ? true : false});
-            break;
-        }
-    }
+		if (abs(accumulatedSum) > peak)
+		{
+			outCorrelations[foundCorrelations].satelliteId = satelliteId + 1;
+			outCorrelations[foundCorrelations].offset = offset;
+			outCorrelations[foundCorrelations].message = accumulatedSum > 0 ? true : false;
+			return true;
+		}
+	}
+	return false;
 }

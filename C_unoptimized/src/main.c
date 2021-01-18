@@ -6,7 +6,7 @@
 
 #include "stdafx.h"
 #include "SequenceGenerator.h"
-//#include "Decoder.h"
+#include "Decoder.h"
 
 // Buch Seite 580+
 
@@ -37,26 +37,36 @@ int main(int argc, char* argv[])
 
     clock_t start = clock();
 
-    // TODO: Put some data on heap
-    bool sequences[NUM_SATELLITES][CHIP_SEQUENCE_LENGTH];
+    bool* sequences[NUM_SATELLITES];
+    for (i = 0; i < NUM_SATELLITES; i++)
+    {
+        sequences[i] = malloc(CHIP_SEQUENCE_LENGTH * sizeof(bool));
+    }
     for (i = 0; i < NUM_SATELLITES; i++)
     {
         CDMA_GenerateSequence(sequences[i], CHIP_SEQUENCE_LENGTH, i);
     }
 
-    //cdma::Decoder chipDecoder(numbers);
-    //std::vector<cdma::Correlation> decodeResult = chipDecoder.decode(generators);
+    int maxElement = chipSequence[0];
+    for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
+    {
+        if (abs(chipSequence[i]) > maxElement)
+        {
+            maxElement = abs(chipSequence[i]);
+        }
+    }
+    Correlation* correlationResults = malloc(maxElement * sizeof(Correlation));
+    CDMA_decode(sequences, chipSequence, maxElement, correlationResults);
 
     clock_t end = clock();
     float timeSpan = (float)(end - start) / CLOCKS_PER_SEC;
 
     // TODO: Fix output
-    //for (cdma::Correlation& correlation : decodeResult)
-    //{
-    //    std::cout << "Satellite " << std::setw(2) << correlation.satelliteId
-    //              << " has sent bit " << correlation.message
-    //              << " (delta = " << std::setw(3) << correlation.offset << ")" << std::endl;
-    //}
+    for (i = 0; i < maxElement; i++)
+    {
+        printf("Satellite %2d has sent bit %d (delta = %3d)\n", 
+            correlationResults[i].satelliteId, correlationResults[i].message, correlationResults[i].offset);
+    }
     printf("Time spent decoding signal: %.5f seconds.\n", timeSpan);
 
     return 0;
