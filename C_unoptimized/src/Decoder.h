@@ -8,8 +8,8 @@
 
 typedef struct
 {
-    uint16_t satelliteId;
-    uint16_t offset;
+    int satelliteId;
+    int offset;
     bool message;
 }Correlation;
 

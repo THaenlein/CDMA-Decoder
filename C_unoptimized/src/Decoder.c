@@ -26,7 +26,7 @@ bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int satelliteId
 	int offset;
 	for (offset = 0; offset < CHIP_SEQUENCE_LENGTH; offset++)
 	{
-		int16_t accumulatedSum = 0;
+		int accumulatedSum = 0;
 		int i;
 		for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
 		{

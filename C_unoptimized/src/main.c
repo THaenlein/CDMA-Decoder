@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 
     FILE* f = fopen(argv[1], "r");
     int32_t chipSequence[CHIP_SEQUENCE_LENGTH];
-    uint16_t i;
+    int i;
 
     for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
     {
@@ -61,7 +61,6 @@ int main(int argc, char* argv[])
     clock_t end = clock();
     float timeSpan = (float)(end - start) / CLOCKS_PER_SEC;
 
-    // TODO: Fix output
     for (i = 0; i < maxElement; i++)
     {
         printf("Satellite %2d has sent bit %d (delta = %3d)\n", 
