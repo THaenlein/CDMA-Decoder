@@ -25,9 +25,9 @@ Optimierungsideen:
 
 int main(int argc, char* argv[])
 {
-#ifndef NDEBUG
+//#ifndef NDEBUG
     argv[1] = "gps_sequence.txt";
-#endif
+//#endif
 
     std::ifstream is(argv[1]);
     std::istream_iterator<int16_t> start(is), end;

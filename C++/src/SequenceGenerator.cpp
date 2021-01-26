@@ -19,7 +19,6 @@ std::vector<bool> SequenceGenerator::generate() const
             motherSequences.second[this->registerSumIndices.first] ^
             motherSequences.second[this->registerSumIndices.second];
 
-        // Is this the right insertion order? Push front or push back? 
         sequence.push_back(motherFirst ^ motherSecond);
 
         shiftMotherSequence(motherSequences.first, SHIFT_INDICES.first);
