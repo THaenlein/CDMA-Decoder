@@ -61,12 +61,19 @@ int main(int argc, char* argv[])
     clock_t end = clock();
     float timeSpan = (float)(end - start) / CLOCKS_PER_SEC;
 
+
     for (i = 0; i < maxElement; i++)
     {
         printf("Satellite %2d has sent bit %d (delta = %3d)\n", 
             correlationResults[i].satelliteId, correlationResults[i].message, correlationResults[i].offset);
     }
     printf("Time spent decoding signal: %.5f seconds.\n", timeSpan);
+
+    free(correlationResults);
+    for (i = 0; i < NUM_SATELLITES; i++)
+    {
+        free(sequences[i]);
+    }
 
     return 0;
 }
