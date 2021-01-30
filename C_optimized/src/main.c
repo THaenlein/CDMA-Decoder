@@ -25,28 +25,14 @@ int main(int argc, char* argv[])
 
     FILE* f = fopen(argv[1], "r");
     int32_t chipSequence[CHIP_SEQUENCE_LENGTH];
-    register int i,k;
+    register int i;
 
     for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
     {
         int result = fscanf(f, "%d ", &chipSequence[i]);
+        (void)result;
     }
     fclose(f);
-
-    //f = fopen("gold_sequences.txt", "r");
-    //bool* precalculatedSequences[NUM_SATELLITES];
-    //for (i = 0; i < NUM_SATELLITES; i++)
-    //{
-    //    precalculatedSequences[i] = malloc(CHIP_SEQUENCE_LENGTH * sizeof(bool));
-    //    for (k = 0; k < CHIP_SEQUENCE_LENGTH; k++)
-    //    {
-    //        int result = fscanf(f, "%d ", &precalculatedSequences[i][k]);
-    //    }
-    //}
-    //for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
-    //{
-    //    //printf("%d ", precalculatedSequences[5][i]);
-    //}
 
     clock_t start = clock();
 
