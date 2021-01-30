@@ -6,21 +6,6 @@
 
 #define MAX_DEVIATION 65
 
-
-void CDMA_decode(bool** sequences, int32_t* chipSequence, int numSendingSatellites, Correlation* outCorrelations)
-{
-	int i;
-	int numCorrelationsFound = 0;
-	int peak = CHIP_SEQUENCE_LENGTH - MAX_DEVIATION * (numSendingSatellites - 1);
-	for (i = 0; i < NUM_SATELLITES; i++)
-	{
-		bool correlationFound = _correlate(sequences[i], chipSequence, peak, i, numCorrelationsFound, outCorrelations);
-		numCorrelationsFound += (int)correlationFound;
-	}
-
-	return;
-}
-
 static bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int satelliteId, int foundCorrelations, Correlation* outCorrelations)
 {
 	int offset;
@@ -43,4 +28,18 @@ static bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int sate
 		}
 	}
 	return false;
+}
+
+void CDMA_decode(bool** sequences, int32_t* chipSequence, int numSendingSatellites, Correlation* outCorrelations)
+{
+	int i;
+	int numCorrelationsFound = 0;
+	int peak = CHIP_SEQUENCE_LENGTH - MAX_DEVIATION * (numSendingSatellites - 1);
+	for (i = 0; i < NUM_SATELLITES; i++)
+	{
+		bool correlationFound = _correlate(sequences[i], chipSequence, peak, i, numCorrelationsFound, outCorrelations);
+		numCorrelationsFound += (int)correlationFound;
+	}
+
+	return;
 }

@@ -34,6 +34,24 @@ static uint8_t shiftRegisterSumIndices[NUM_SATELLITES][2] = {
 static uint8_t SHIFT_INDICES_TOP[] = { 2 };
 static uint8_t SHIFT_INDICES_BOTTOM[] = { 1, 2, 5, 7, 8 };
 
+static void _shiftMotherSequence(bool* sequence, int size, uint8_t* xorIndices, int indiceSize)
+{
+    bool newElement = sequence[size - 1];
+    int i;
+    for (i = 0; i < indiceSize; i++)
+    {
+        uint8_t index = xorIndices[i];
+        newElement ^= sequence[index];
+    }
+
+    // Shift mother sequence
+    for (i = size - 1; i > 0; i--)
+    {
+        sequence[i] = sequence[i - 1];
+    }
+
+    sequence[0] = newElement;
+}
 
 void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices)
 {
@@ -56,23 +74,4 @@ void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices)
     }
 
     return;
-}
-
-static void _shiftMotherSequence(bool* sequence, int size, uint8_t* xorIndices, int indiceSize)
-{
-    bool newElement = sequence[size - 1];
-    int i;
-    for (i = 0; i < indiceSize; i++)
-    {
-        uint8_t index = xorIndices[i];
-        newElement ^= sequence[index];
-    }
-
-    // Shift mother sequence
-    for (i = size - 1; i > 0; i--)
-    {
-        sequence[i] = sequence[i - 1];
-    }
-
-    sequence[0] = newElement;
 }
