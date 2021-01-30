@@ -5,7 +5,6 @@
 #include <stdbool.h>
 
 #include "stdafx.h"
-#include "SequenceGenerator.h"
 #include "Decoder.h"
 
 // Buch Seite 580+
