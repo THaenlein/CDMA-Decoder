@@ -19,9 +19,9 @@ Optimierungsideen:
 
 int main(int argc, char* argv[])
 {
-//#ifndef NDEBUG
+#ifndef NDEBUG
     argv[1] = "gps_sequence.txt";
-//#endif
+#endif
 
     FILE* f = fopen(argv[1], "r");
     int32_t chipSequence[CHIP_SEQUENCE_LENGTH];
