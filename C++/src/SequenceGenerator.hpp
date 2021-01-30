@@ -1,7 +1,8 @@
 #pragma once
 
-#include<vector>
-#include<deque>
+#include <cstdint>
+#include <vector>
+#include <deque>
 
 namespace cdma
 {
