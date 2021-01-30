@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
     for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
     {
         int result = fscanf(f, "%d ", &chipSequence[i]);
+        (void)result;
     }
     fclose(f);
 

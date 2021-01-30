@@ -21,7 +21,7 @@ void CDMA_decode(bool** sequences, int32_t* chipSequence, int numSendingSatellit
 	return;
 }
 
-bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int satelliteId, int foundCorrelations, Correlation* outCorrelations)
+static bool _correlate(bool* sequence, int32_t* chipSequence, int peak, int satelliteId, int foundCorrelations, Correlation* outCorrelations)
 {
 	int offset;
 	for (offset = 0; offset < CHIP_SEQUENCE_LENGTH; offset++)

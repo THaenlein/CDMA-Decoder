@@ -58,7 +58,7 @@ void CDMA_GenerateSequence(bool* sequence, int size, int indexOfIndices)
     return;
 }
 
-void _shiftMotherSequence(bool* sequence, int size, uint8_t* xorIndices, int indiceSize)
+static void _shiftMotherSequence(bool* sequence, int size, uint8_t* xorIndices, int indiceSize)
 {
     bool newElement = sequence[size - 1];
     int i;
