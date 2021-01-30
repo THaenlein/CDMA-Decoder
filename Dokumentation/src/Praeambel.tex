@@ -1,0 +1,243 @@
+\documentclass[a4paper, 11pt]{article}
+%------------------------------- Packages ---------------------------------%
+\usepackage[utf8]{inputenc}
+\usepackage[export]{adjustbox}
+\usepackage[ngerman]{babel}
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{graphicx, wrapfig}
+\usepackage{url, hyphenat}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{enumerate}
+\usepackage{pdfpages}
+\usepackage{fontspec}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{csquotes}
+
+%------------------------------ Definitions -------------------------------%
+% Header and footer style
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\leftmark}
+\fancyfoot[R]{Seite \thepage}
+\renewcommand{\headrulewidth}{1.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+\newlength\FHoffset
+\setlength\FHoffset{1cm}
+\addtolength\headwidth{2\FHoffset}
+\fancyheadoffset{\FHoffset}
+\newlength\FHleft
+\newlength\FHright
+\setlength\FHoffset{1cm}
+\setlength\FHleft{1cm}
+\setlength\FHright{-1cm}
+\newbox\FHline
+\setbox\FHline=\hbox{\hsize=\paperwidth%
+	\hspace*{\FHleft}%
+	\rule{\dimexpr\headwidth-\FHleft-\FHright\relax}{\headrulewidth}\hspace*{\FHright}%
+}
+\renewcommand\headrule{\vskip-.7\baselineskip\copy\FHline}
+
+%------------------------------ Custom Commands ---------------------------%
+\newcommand{\inputSerif}[1]{{\aleo \input{#1}}}
+\newcommand{\inputSans}[1]{{\sans \input{#1}}}
+\newcommand{\inputSansLight}[1]{{\sansLight \input{#1}}}
+\newcommand{\inputMono}[1]{{\roboto \input{#1}}}
+\newcommand{\inputMonoLight}[1]{{\robotoLight \input{#1}}}
+\newcommand{\inputMonoThin}[1]{{\robotoThin \input{#1}}}
+\newcommand{\code}[1]{{\roboto \color{eelGray} {#1}}}
+
+\newcommand{\longTableEntry}[2]{#1 & #2 \\}
+
+\def \imagePath {../ressources/img}
+\def \textPath {../ressources/text}
+\def \listingPath {../ressources/listings}
+\def \fontPath {../ressources/fonts}
+\def \tablePath {../ressources/tables}
+\def \umlPath {../ressources/uml}
+
+\MakeOuterQuote{"}
+
+%------------------------------ Custom colors -----------------------------%
+\definecolor{white}	{rgb}{1, 1, 1}
+\definecolor{black}	{rgb}{0, 0, 0}
+
+\definecolor{gray5}  {gray}{0.95}
+\definecolor{gray10} {gray}{0.9}
+\definecolor{gray20} {gray}{0.8}
+\definecolor{gray50} {gray}{0.5}
+\definecolor{gray85} {gray}{0.15}
+
+
+\definecolor{darkGray}    {HTML}{323b3a}
+\definecolor{lightGray}   {HTML}{b0b8bb}
+\definecolor{iridiumGray} {HTML}{3d3c3a}
+\definecolor{eelGray}     {HTML}{463e3f}
+
+%------------------------------ Custom fonts ------------------------------%
+
+% Aleo
+\newfontfamily{\aleo}{Aleo}
+[
+Path = ../ressources/fonts/Aleo/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+\newfontfamily{\aleoLight}{Aleo}
+[
+Path = ../ressources/fonts/Aleo/,
+UprightFont = *-Light,
+ItalicFont = *-LightItalic
+]
+
+% Roboto Mono
+\newfontfamily{\roboto}{RobotoMono}
+[
+Path = ../ressources/fonts/Roboto-Mono/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+\newfontfamily{\robotoLight}{RobotoMono}
+[
+Path = ../ressources/fonts/Roboto-Mono/,
+UprightFont = *-Light,
+ItalicFont = *-LightItalic
+]
+\newfontfamily{\robotoThin}{RobotoMono}
+[
+Path = ../ressources/fonts/Roboto-Mono/,
+UprightFont = *-Thin,
+ItalicFont = *-ThinItalic
+]
+
+% Source Sans Pro
+\newfontfamily{\sans}{SourceSansPro}
+[
+Path = ../ressources/fonts/Source-Sans-Pro/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+\newfontfamily{\sansLight}{SourceSansPro}
+[
+Path = ../ressources/fonts/Source-Sans-Pro/,
+UprightFont = *-Light,
+ItalicFont = *-LightItalic
+]
+\newfontfamily{\sansExtraLight}{SourceSansPro}
+[
+Path = ../ressources/fonts/Source-Sans-Pro/,
+UprightFont = *-ExtraLight,
+ItalicFont = *-ExtraLightItalic
+]
+\newfontfamily{\sansBlack}{SourceSansPro}
+[
+Path = ../ressources/fonts/Source-Sans-Pro/,
+UprightFont = *-Black,
+ItalicFont = *-BlackItalic
+]
+
+% Source Serif Pro
+\newfontfamily{\serif}{SourceSerifPro}
+[
+Path = ../ressources/fonts/Source-Serif-Pro/,
+UprightFont = *-Regular,
+BoldFont = *-Bold
+]
+
+% Raleway
+\newfontfamily{\raleway}{Raleway}
+[
+Path = ../ressources/fonts/Raleway/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+\newfontfamily{\ralewayLight}{Raleway}
+[
+Path = ../ressources/fonts/Raleway/,
+UprightFont = *-Light,
+ItalicFont = *-LightItalic
+]
+\newfontfamily{\ralewayExtraLight}{Raleway}
+[
+Path = ../ressources/fonts/Raleway/,
+UprightFont = *-ExtraLight,
+ItalicFont = *-ExtraLightItalic
+]
+\newfontfamily{\ralewayThin}{Raleway}
+[
+Path = ../ressources/fonts/Raleway/,
+UprightFont = *-Thin,
+ItalicFont = *-ThinItalic
+]
+\newfontfamily{\ralewayBlack}{Raleway}
+[
+Path = ../ressources/fonts/Raleway/,
+UprightFont = *-Black,
+ItalicFont = *-BlackItalic
+]
+
+% Titillium
+\newfontfamily{\titillium}{TitilliumWeb}
+[
+Path = ../ressources/fonts/Titillium/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+\newfontfamily{\titilliumLight}{TitilliumWeb}
+[
+Path = ../ressources/fonts/Titillium/,
+UprightFont = *-Light,
+ItalicFont = *-LightItalic
+]
+\newfontfamily{\titilliumExtraLight}{TitilliumWeb}
+[
+Path = ../ressources/fonts/Titillium/,
+UprightFont = *-ExtraLight,
+ItalicFont = *-ExtraLightItalic
+]
+
+
+\setsansfont{Aleo}
+[
+Path = ../ressources/fonts/Aleo/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+
+\setmonofont{RobotoMono}
+[
+Path = ../ressources/fonts/Roboto-Mono/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]
+
+\setmainfont{SourceSansPro}
+[
+Path = ../ressources/fonts/Source-Sans-Pro/,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold,
+BoldItalicFont = *-BoldItalic
+]

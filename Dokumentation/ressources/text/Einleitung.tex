@@ -1,0 +1,6 @@
+Dieser Bericht dokumentiert die Implementierung eines CDMA-Decoders in den Sprachen C und C++ sowie die Laufzeitoptimierung in C. Dies wurde im Wintersemester 2020/21 an der Hochschule Karlsruhe im Rahmen des vorlesungsbegleitenden Labors "Embedded-Software" umgesetzt. 
+
+Code Division Multiple Access (CDMA) ist ein Codemultiplexverfahren, welches die zeitgleiche Datenübermittlung mehrerer Übertragungen auf derselben Frequenz ermöglicht. Dabei wird zwischen synchronem und asynchronem CDMA unterschieden, wobei sich diese Umsetzung auf synchrones CDMA beschränkt, das bei der Codierung von Chipsequenzen des GPS zum Einsatz kommt.
+
+Um eine portable und leichtgewichtige Lösung zu garantieren, kamen keine Bibliotheken außer der Standard Template Library (STL) zum Einsatz. Die Implementierung setzt auf ein CMake-Projekt auf. Entwickelt wurde unter Windows mit MSVC, getestet unter Linux mit gcc.
+Das Programm soll eine in einer Datei gespeicherten Chipsequenz einlesen, decodieren und anschließend die Ergebnisse auf der Konsole mit den Informationen, welcher Satellit mit welchem Versatz welches Bit gesendet hat, ausgeben. 

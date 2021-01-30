@@ -1,0 +1,32 @@
+\subsection{C++}
+Die Implementierung des Decoders in C++ geschieht sprachbedingt objektorientiert. Für die Verwaltung von Feldern und ähnlichen Datenstrukturen wurde die STL-Library verwendet. Somit konnte komplett auf die manuelle Allokation von Heap-Speicher verzichtet und somit Speicherlecks präveniert werden. Die Zeitmessung geschieht mittels \code{std::chrono}, um eine portable Lösung zu gewährleisten. Bei dem verwendeten C++-Standard handelt es sich um C++11, welcher aufgrund der Verwendung von \code{std::move}, der Chrono-Bibliothek und Listeninitialisierung benötigt wird. Der C++-Code gliedert sich essenziell in 6 Segmente:
+\begin{enumerate}
+	\item Einlesen der Chipsequenz
+	\item Starten der Zeitmessung
+	\item Erstellen der Sequenzgeneratoren
+	\item Instanziieren des Decoders und Ausführung der Decodierung
+	\item Stoppen der Zeitmessung
+	\item Ausgabe der berechneten Ergebnisse und benötigen Zeit
+\end{enumerate}
+Mittels \code{std::ifstream} und \code{std::istream\_iterator} wird eine als Programmargument angegebene Textdatei eingelesen und zeichenweise in einem \code{std::vector} als Integer abgespeichert.
+Nach dem "starten" des Timers werden die Sequenzgeneratoren mit den jeweiligen Indizes der Muttersequenzen erstellt und in einem \code{std::vector} abgelegt. Die Goldsequenzen werden an dieser Stelle noch nicht generiert.
+Zum Instanziieren des Decoders ist die eingelesene Chipsequenz zu übergeben. Da es sich hier um eine größere Datenmenge (1KB) handelt und sie nach der Decodierung in der Main-Funktion nicht mehr benötigt wird, verschiebt der Konstruktor die Sequenz mittels \code{std::move} in ein Attribut des Objekts. Anschließend führt der Decoder die Decodierung des Signals aus und gibt die Ergebnisse zurück, die anschließend zusammen mit der gemessenen Zeit an den "Standard Output Stream" übergeben werden.
+
+\subsubsection*{SequenceGenerator}
+Der SequenceGenerator führt die Generierung der Goldsequenzen aus, die benötigt werden, um die Kreuzkorrelation durchzuführen. Dazu sind die öffentliche Methode \code{generate()} und die private Methode \code{shiftMotherSequence()} bereitgestellt. \code{shiftMotherSequence()} modelliert die Verschiebung der Muttersequenzen und das Einfügen des neuen Elements am Anfang der Liste. 
+\code{generate()} generiert die Goldsequenz mit den angegebenen Indizes. Dafür wird für die Länge der resultierenden Sequenz elementweise aus den Muttersequenzen gebildet und in einem \code{std::vector} fixer Länge gespeichert. Die zwei Muttersequenzen von jedem Generator sind durch die STL-Struktur \code{std::deque} modelliert, da diese konstante Laufzeit für das Einfügen von Elementen am Anfang garantieren. Nach der Erzeugung der Goldfolge, wird der \code{std::vector} zurückgegeben.
+
+\subsubsection*{Decoder}
+Ähnlich wie die Klasse SequenceGenerator hat die Klasse Decoder eine öffentliche Methode \code{decode()} und eine private Methode \code{correlate()}. \code{decode()} nimmt dabei als Parameter den zuvor erzeugten \code{std::vector} mit den Sequenzgeneratoren. Für jeden Generator wird die zugehörige Sequenz mittels \code{SequenceGenerator::generate()} erzeugt und in die Methode \code{correlate()} gegeben. Zusätzlich werden der Peak, die aktuelle Satelliten-ID und einen Zeiger auf den Outparameter in die private Methode übergeben. Am Ende wird ein \code{std::vector} mit den gefundenen Korrelationen zurückgegeben.
+\code{correlate()} kreuzkorreliert die Goldfolge und akkumuliert die jeweiligen Einträge in der Chipsequenz auf. Ist der absolute Wert der Akkumulation höher als der gegebene Peak, wurde eine Übereinstimmung gefunden. Die Satelliten-ID, das Offset sowie das gesendete Bit bilden dann eine Struct, die an den Outparameter angehängt wird. An dieser Stelle kann die Korrelation abgebrochen werden.
+
+\subsection{C}
+Basierend auf der C++-Implementierung wurde die C-Version geschrieben. Dabei ist zu beachten, dass C im Gegensatz zu C++ keine Namensräume und Objektorientierung kennt. Das bedeutet, dass die Objektattribute aus SequenceGenerator und Decoder entweder als Parameter übergeben oder wenn möglich als Modulvariable deklariert werden müssen. Somit wurde der Namespace "CDMA" entfernt und den öffentlichen Methoden als Namenspräfix angehängt, wobei die privaten Methoden nun als statisch bezeichnet sind und mit einem Unterstrich beginnen. Durch die genannten Gegebenheiten müssen sämtliche Vektoren in Arrays umgeschrieben werden. 
+Da nun keine SequenceGenerator-Objekte mehr erstellt werden können, sind die Goldfolgen vorher zu generieren und anschließend an die decode-Methode zu übergeben. Dafür wird ein Stack-Array mit 24 Einträgen erstellt, das für jeden Satelliten einen Pointer auf seine Goldfolge speichert.
+Die Decodierung und Ausgabe der Ergebnisse erfolgt dann analog zur C++-Implementierung. Zusätzlich muss noch der mit \code{malloc()} allokierte Speicher, also die Goldsequenzen und die Korrelationsergebnisse mit \code{free()} freigegeben werden, um Speicherlecks vorzubeugen. 
+
+\subsubsection*{SequenceGenerator}
+Der Sequenzgenerator ist nun keine Klasse mehr, sondern ein Modul aus einer "öffentlichen" Funktion \code{CDMA\_GenerateSequence()} und einer statischen Funktion \code{\_shiftMotherSequence}. Das Modul ist damit ähnlich aufgebaut wie die C++-Klasse. Allerdings werden keine Generatorobjekte erzeugt, sondern die Goldsequenz mit entsprechendem Index von erster Funktion generiert und in einen Outparameter geschrieben. Die Muttersequenzen sind hierbei durch Stackarrays statt \code{std::deque} modelliert, was eine Verschiebung aller Elemente darin erfordert, um eines am Anfang anzufügen.
+
+\subsubsection*{Decoder}
+Im Modul "Decoder" finden sich wie auch in der C++-Implementierung zwei Funktionen wieder: \code{CDMA\_decode()} und \code{\_correlate()}. Erstere wird in \code{main()} aufgerufen und startet die Korrelation für jede Goldfolge. Zweitere führt die Kreuzkorrelation anhand der übergebenen Sequenz aus und akkumuliert die entsprechenden Stellen der Chipsequenz. Wie in C++ wird ein Outparameter verwendet, um die Korrelationsergebnisse zu speichern. Allerdings muss nun zusätzlich ein boolscher Wert zurückgegeben werden, um Information darüber zu führen, wie viele Ergebnisse bereits gefunden wurden. Für die Ergebnisse wird so viel Speicher reserviert, wie es sendende Satelliten gibt.

@@ -1,0 +1,32 @@
+\input{Praeambel.tex}
+
+\usepackage[a4paper, bottom=3cm]{geometry}
+
+\bibliographystyle{plain}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{3}
+
+\begin{document}
+	% TITELSEITE
+	\includepdf{../out/Titelseite.pdf}
+
+	% INHALTSVERZEICHNIS
+	\tableofcontents
+	
+	% ABBILDUNGSVERZEICHNIS
+	\listoffigures
+	\newpage
+	
+	
+	% BERICHT
+	\section{Einleitung}
+	\inputSerif{\textPath/Einleitung.tex}
+	\section{Implementierung}
+	\inputSerif{\textPath/Implementierung.tex}
+	\section{Laufzeitanalyse}
+	\inputSerif{\textPath/Laufzeitanalyse.tex}
+	\section{Werkzeuge}
+	\inputSerif{\textPath/Werkzeuge.tex}
+	
+	
+\end{document}
