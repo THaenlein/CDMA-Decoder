@@ -41,7 +41,7 @@ The runtime analysis was carried out in both C\+\+ and C. The optimized versions
 ## Installation and execution
 1. Clone the repository:
    ```bash
-   git clone https://github.com/THaenlein/Embedded-Labor.git
+   git clone https://github.com/THaenlein/CDMA-Decoder.git
    ```
 2. Build instructions:
    - Under Windows:
