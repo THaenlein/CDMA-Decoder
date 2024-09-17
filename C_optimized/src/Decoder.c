@@ -46,7 +46,7 @@ void CDMA_decode(int32_t* __restrict chipSequence, const uint32_t numSendingSate
 		{
 			break;
 		}
-		const int32_t* const goldSequencesPtr = (const int32_t*)goldSequences + j;
+		const int32_t* const goldSequencesPtr = (const int32_t*)goldSequences + j * 2 * CHIP_SEQUENCE_LENGTH;
 		register uint16_t offset;
 		for (offset = 0; offset < CHIP_SEQUENCE_LENGTH; ++offset)
 		{
