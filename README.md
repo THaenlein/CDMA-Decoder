@@ -33,6 +33,21 @@ The runtime analysis was carried out in both C\+\+ and C. The optimized versions
 - **C unoptimized**: The unoptimized C version achieved a smaller speed increase, with the release build only halving the runtime.
 - **C optimized**: The optimized C version resulted in an additional reduction in runtime due to specific improvements such as the removal of the modulo operator.
 
+## Correlation landscape visualization (Python)
+An insight-focused visualization script is available at:
+
+```bash
+python tools/plot_correlation_landscape.py
+```
+
+It reconstructs all 24 Gold sequences, computes the full circular correlation landscape
+(satellite x code phase), and overlays detected satellites/offsets using the same threshold
+logic as the decoder. This explains *why* satellites are detected, not only *which* ones.
+
+Generated artifacts:
+- Static: `artifacts/plots/correlation_landscape.png` and `.pdf`
+- Interactive: `artifacts/plots/correlation_landscape.html`
+
 ## Prerequisites
 - **C\+\+11** for the C\+\+ implementation.
 - **CMake** to manage the build.
