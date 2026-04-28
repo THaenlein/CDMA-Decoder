@@ -18,24 +18,42 @@ Optimierungsideen:
 
 int main(int argc, char* argv[])
 {
+    const char* inputPath = NULL;
 #ifndef NDEBUG
-    argv[1] = "gps_sequence.txt";
+    inputPath = "gps_sequence.txt";
+#else
+    if (argc < 2)
+    {
+        fprintf(stderr, "Missing input file argument.\n");
+        return 1;
+    }
+    inputPath = argv[1];
 #endif
 
-    FILE* f = fopen(argv[1], "r");
+    FILE* f = fopen(inputPath, "r");
+    if (f == NULL)
+    {
+        fprintf(stderr, "Failed to open input file: %s\n", inputPath);
+        return 1;
+    }
     int32_t chipSequence[CHIP_SEQUENCE_LENGTH];
-    register int i;
+    int i;
 
     for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
     {
         int result = fscanf(f, "%d ", &chipSequence[i]);
-        (void)result;
+        if (result != 1)
+        {
+            fprintf(stderr, "Failed to parse chip sequence at position %d.\n", i);
+            fclose(f);
+            return 1;
+        }
     }
     fclose(f);
 
     clock_t start = clock();
 
-    int maxElement = *chipSequence;
+    int maxElement = abs(*chipSequence);
     int absolute;
     for (int32_t* seqPtr = chipSequence; seqPtr < chipSequence+CHIP_SEQUENCE_LENGTH; seqPtr++)
     {
@@ -46,6 +64,11 @@ int main(int argc, char* argv[])
         }
     }
     Correlation* correlationResults = malloc(maxElement * sizeof(Correlation));
+    if (correlationResults == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for decode results.\n");
+        return 1;
+    }
     CDMA_decode(chipSequence, (uint32_t) maxElement, correlationResults);
 
     clock_t end = clock();
@@ -58,5 +81,6 @@ int main(int argc, char* argv[])
     }
     printf("Time spent decoding signal: %.5f seconds.\n", timeSpan);
 
+    free(correlationResults);
     return 0;
 }

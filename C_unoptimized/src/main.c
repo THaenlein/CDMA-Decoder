@@ -21,18 +21,37 @@ Optimierungsideen:
 
 int main(int argc, char* argv[])
 {
+    const char* inputPath = NULL;
 #ifndef NDEBUG
-    argv[1] = "gps_sequence.txt";
+    inputPath = "gps_sequence.txt";
+#else
+    if (argc < 2)
+    {
+        fprintf(stderr, "Missing input file argument.\n");
+        return 1;
+    }
+    inputPath = argv[1];
 #endif
 
-    FILE* f = fopen(argv[1], "r");
+    FILE* f = fopen(inputPath, "r");
+    if (f == NULL)
+    {
+        fprintf(stderr, "Failed to open input file: %s\n", inputPath);
+        return 1;
+    }
+
     int32_t chipSequence[CHIP_SEQUENCE_LENGTH];
     int i;
 
     for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
     {
         int result = fscanf(f, "%d ", &chipSequence[i]);
-        (void)result;
+        if (result != 1)
+        {
+            fprintf(stderr, "Failed to parse chip sequence at position %d.\n", i);
+            fclose(f);
+            return 1;
+        }
     }
     fclose(f);
 
@@ -42,21 +61,41 @@ int main(int argc, char* argv[])
     for (i = 0; i < NUM_SATELLITES; i++)
     {
         sequences[i] = malloc(CHIP_SEQUENCE_LENGTH * sizeof(bool));
+        if (sequences[i] == NULL)
+        {
+            fprintf(stderr, "Failed to allocate memory for generated sequences.\n");
+            while (i > 0)
+            {
+                --i;
+                free(sequences[i]);
+            }
+            return 1;
+        }
     }
     for (i = 0; i < NUM_SATELLITES; i++)
     {
         CDMA_GenerateSequence(sequences[i], CHIP_SEQUENCE_LENGTH, i);
     }
 
-    int maxElement = chipSequence[0];
+    int maxElement = abs(chipSequence[0]);
     for (i = 0; i < CHIP_SEQUENCE_LENGTH; i++)
     {
-        if (abs(chipSequence[i]) > maxElement)
+        int absolute = abs(chipSequence[i]);
+        if (absolute > maxElement)
         {
-            maxElement = abs(chipSequence[i]);
+            maxElement = absolute;
         }
     }
     Correlation* correlationResults = malloc(maxElement * sizeof(Correlation));
+    if (correlationResults == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory for decode results.\n");
+        for (i = 0; i < NUM_SATELLITES; i++)
+        {
+            free(sequences[i]);
+        }
+        return 1;
+    }
     CDMA_decode(sequences, chipSequence, maxElement, correlationResults);
 
     clock_t end = clock();

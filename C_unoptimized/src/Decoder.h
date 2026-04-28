@@ -14,4 +14,4 @@ typedef struct
 }Correlation;
 
 
-void CDMA_decode(bool** sequences, int32_t* chipSequence, int numSendingSatellites, Correlation* outCorrelations);
+void CDMA_decode(bool* const* sequences, const int32_t* chipSequence, int numSendingSatellites, Correlation* outCorrelations);

@@ -7,7 +7,6 @@
 
 namespace cdma
 {
-
 	struct Correlation
 	{
 		uint16_t satelliteId;
@@ -18,22 +17,16 @@ namespace cdma
 	class Decoder
 	{
 	public:
-
-		Decoder(std::vector<int16_t>& sequence);
+		explicit Decoder(const std::vector<int16_t>& sequence);
 
 		std::vector<Correlation> decode(const std::vector<SequenceGenerator>& generators) const;
 
-	protected:
-
 	private:
-
 		void correlate(
-			std::vector<bool>& sequence,
+			const std::vector<bool>& sequence,
 			const uint16_t peak,
 			size_t satelliteId,
-			std::vector<Correlation>* outResult) const;
-
-	private:
+			std::vector<Correlation>& outResult) const;
 		
 		std::vector<int16_t> chipSequence;
 

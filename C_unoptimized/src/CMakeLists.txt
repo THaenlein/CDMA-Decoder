@@ -1,7 +1,6 @@
 ###############################################################################
 ## Add common header files
 LIST(APPEND HEADERFILES
-  "${CMAKE_CURRENT_LIST_DIR}/main.h"
   "${CMAKE_CURRENT_LIST_DIR}/SequenceGenerator.h"
   "${CMAKE_CURRENT_LIST_DIR}/Decoder.h"
   "${CMAKE_CURRENT_LIST_DIR}/stdafx.h"

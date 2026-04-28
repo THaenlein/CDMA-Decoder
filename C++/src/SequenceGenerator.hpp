@@ -22,9 +22,7 @@ namespace cdma
 
 		std::vector<bool> generate() const;
 
-	protected:
-
-		void shiftMotherSequence(std::deque<bool>& motherSequence, std::vector<uint8_t>& xorIndices) const;
+		void shiftMotherSequence(std::deque<bool>& motherSequence, const std::vector<uint8_t>& xorIndices) const;
 
 	private:
 
@@ -34,7 +32,7 @@ namespace cdma
 
 		static const size_t REGISTER_LENGTH;
 
-		static MotherSequenceIndices SHIFT_INDICES;
+		static const MotherSequenceIndices SHIFT_INDICES;
 	};
 
 }

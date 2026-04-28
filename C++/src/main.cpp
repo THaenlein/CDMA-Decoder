@@ -6,6 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <chrono>
+#include <array>
 
 #include "SequenceGenerator.hpp"
 #include "Decoder.hpp"
@@ -25,18 +26,37 @@ Optimierungsideen:
 
 int main(int argc, char* argv[])
 {
+    const char* inputPath = nullptr;
 #ifndef NDEBUG
-    argv[1] = "gps_sequence.txt";
+    inputPath = "gps_sequence.txt";
+#else
+    if (argc < 2)
+    {
+        std::cerr << "Missing input file argument." << std::endl;
+        return 1;
+    }
+    inputPath = argv[1];
 #endif
 
-    std::ifstream is(argv[1]);
+    std::ifstream is(inputPath);
+    if (!is)
+    {
+        std::cerr << "Failed to open input file: " << inputPath << std::endl;
+        return 1;
+    }
+
     std::istream_iterator<int16_t> start(is), end;
     std::vector<int16_t> numbers(start, end);
-    const uint32_t sequenceLenth = static_cast<uint32_t>(numbers.size());
+    if (numbers.empty())
+    {
+        std::cerr << "Input file does not contain a valid chip sequence." << std::endl;
+        return 1;
+    }
+    const uint32_t sequenceLength = static_cast<uint32_t>(numbers.size());
 
     TimeStamp timeStart = std::chrono::system_clock::now();
 
-    std::vector<cdma::IndexPair> shiftRegisterSumIndices {
+    const std::array<cdma::IndexPair, 24> shiftRegisterSumIndices{{
         { 1, 5 },
         { 2, 6 },
         { 3, 7 },
@@ -61,13 +81,13 @@ int main(int argc, char* argv[])
         { 5, 8 },
         { 0, 2 },
         { 3, 5 }
-    };
+    }};
 
     std::vector<cdma::SequenceGenerator> generators;
     generators.reserve(shiftRegisterSumIndices.size());
     for (const cdma::IndexPair& indices : shiftRegisterSumIndices)
     {
-        generators.push_back(cdma::SequenceGenerator(indices, sequenceLenth));
+        generators.push_back(cdma::SequenceGenerator(indices, sequenceLength));
     }
 
     cdma::Decoder chipDecoder(numbers);
@@ -84,4 +104,5 @@ int main(int argc, char* argv[])
                   << " (delta = " << std::setw(3) << correlation.offset << ")" << std::endl;
     }
     std::cout << "Time spent decoding signal: " << std::setprecision(6) << runTime << " seconds." << std::endl;
+    return 0;
 }

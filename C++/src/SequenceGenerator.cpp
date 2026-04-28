@@ -1,12 +1,10 @@
 #include "SequenceGenerator.hpp"
 
-using namespace cdma;
+/*static*/ const size_t cdma::SequenceGenerator::REGISTER_LENGTH = 10;
 
-/*static*/ const size_t SequenceGenerator::REGISTER_LENGTH = 10;
+/*static*/ const cdma::MotherSequenceIndices cdma::SequenceGenerator::SHIFT_INDICES({ 2 }, { 1, 2, 5, 7, 8 });
 
-/*static*/ MotherSequenceIndices SequenceGenerator::SHIFT_INDICES({ 2 }, { 1, 2, 5, 7, 8 });
-
-std::vector<bool> SequenceGenerator::generate() const
+std::vector<bool> cdma::SequenceGenerator::generate() const
 {
     std::vector<bool> sequence;
     sequence.reserve(this->sequenceLength);
@@ -25,10 +23,10 @@ std::vector<bool> SequenceGenerator::generate() const
         shiftMotherSequence(motherSequences.second, SHIFT_INDICES.second);
     }
     
-    return move(sequence);
+    return sequence;
 }
 
-void SequenceGenerator::shiftMotherSequence(std::deque<bool>& motherSequence, std::vector<uint8_t>& xorIndices) const
+void cdma::SequenceGenerator::shiftMotherSequence(std::deque<bool>& motherSequence, const std::vector<uint8_t>& xorIndices) const
 {
     bool newElement = motherSequence.back();
     for (uint8_t index : xorIndices)

@@ -1,7 +1,6 @@
 ###############################################################################
 ## Add common header files
 LIST(APPEND HEADERFILES
-  "${CMAKE_CURRENT_LIST_DIR}/main.hpp"
   "${CMAKE_CURRENT_LIST_DIR}/SequenceGenerator.hpp"
   "${CMAKE_CURRENT_LIST_DIR}/Decoder.hpp"
 )
